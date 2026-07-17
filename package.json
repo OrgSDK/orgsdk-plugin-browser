@@ -1,0 +1,28 @@
+{
+	"name": "@orgsdk/plugin-browser",
+	"version": "1.1.1",
+	"description": "Hardened HTML→PDF renderer (headless Chromium, JS disabled, all external requests blocked)",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"check": "biome check .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"test": "bun test",
+		"test:integration": "BROWSER_INTEGRATION=1 bun test",
+		"validate": "orgsdk-plugin validate",
+		"package": "orgsdk-plugin package",
+		"version-guard": "orgsdk-plugin version-guard",
+		"publish": "orgsdk-plugin publish",
+		"build": "bun run typecheck && bun run validate && bun run package"
+	},
+	"dependencies": {
+		"playwright": "1.60.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.4",
+		"@orgsdk/plugins": "0.2.1",
+		"@types/bun": "^1.3.9",
+		"typescript": "~6.0.3"
+	}
+}

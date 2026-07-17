@@ -1,0 +1,22 @@
+{
+	"$schema": "https://orgsdk.ai/schemas/plugin-manifest.v1.json",
+	"name": "browser",
+	"version": "1.1.1",
+	"description": "Browser automation: hardened PDF generation from HTML via headless Chromium",
+	"entry": "pdf-functions.ts",
+	"marketplace": {
+		"displayName": "Browser",
+		"category": "Documents & Output",
+		"tagline": "Hardened headless browser tooling for agents — render HTML to PDF with JavaScript disabled and all external requests blocked.",
+		"tags": ["automation", "pdf", "documents"],
+		"useCases": [
+			"Generate a PDF report from agent output and email it",
+			"Render invoices, receipts, or summaries to PDF",
+			"Produce a downloadable artifact from a workflow"
+		],
+		"permissionsSummary": "Local headless browser rendering only. JavaScript is disabled and all external/resource requests are blocked. No credentials, no network egress, no destructive actions.",
+		"links": {
+			"sourceRepo": "https://github.com/OrgSDK/orgsdk-plugin-browser"
+		}
+	}
+}

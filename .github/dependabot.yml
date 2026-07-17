@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # GitHub Actions — checks for updates to pinned action SHAs.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci(deps)"
+
+  # npm/Bun — checks for package.json dependency updates.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps"
+    # Playwright is pinned to exactly 1.60.0 — the hardened renderer was
+    # qualified against that major driver. Block auto-bumps; review manually.
+    ignore:
+      - dependency-name: "playwright"
