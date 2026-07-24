@@ -22,7 +22,7 @@ jobs:
     # installed — tests run against a mock ChromiumLauncher that asserts every
     # hardening control (CSP injection, route interception, size ceilings,
     # mutex, cleanup, sanitized errors). Fast and deterministic.
-    uses: OrgSDK/plugins/.github/workflows/plugin-ci.yml@4eb6706b38a8b1ccbad8b68bfbe9924e3167ef1f
+    uses: OrgSDK/plugins/.github/workflows/plugin-ci.yml@c5296ffdc31e567a0ae3dd32a25594702995d839
     with:
       artifact-name: plugin-browser-${{ github.sha }}
 
