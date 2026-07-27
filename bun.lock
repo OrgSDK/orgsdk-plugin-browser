@@ -9,7 +9,7 @@
       },
       "devDependencies": {
         "@biomejs/biome": "^2.5.4",
-        "@orgsdk/plugins": "0.2.1",
+        "@orgsdk/plugins": "0.2.2",
         "@types/bun": "^1.3.9",
         "typescript": "~6.0.3",
       },
@@ -34,7 +34,7 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.5.4", "", { "os": "win32", "cpu": "x64" }, "sha512-U1jaluLw1qQc2Tx7/CeSoL9N5XcqIH+GWjpUAy1ouB5nVjSCMNO+NNHdY3RAs8zxNurLWAdj6pehQdCA2zyU+Q=="],
 
-    "@orgsdk/plugins": ["@orgsdk/plugins@0.2.1", "", { "peerDependencies": { "zod": "^3.23.0 || ^4.0.0" }, "bin": { "orgsdk-plugin": "src/cli.ts" } }, "sha512-b7xnRDoSpO5cSb/XTyCJYVhzrGxxVYeS0he/YE9BOc6Wf6bsGmewx8IlVUOzKGPCH6yy9B6KaBVjLCRmtBGR+Q=="],
+    "@orgsdk/plugins": ["@orgsdk/plugins@0.2.2", "", { "peerDependencies": { "zod": "^3.23.0 || ^4.0.0" }, "bin": { "orgsdk-plugin": "src/cli.ts" } }, "sha512-u2kjIzfe3E7ZsHS/ksdGj7Rg6e7Rw4ezhCPpsdNnzGcQgKsVy5H8tGscX9VGnnOBNVOzpueSQmvNykWnyluhhQ=="],
 
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 

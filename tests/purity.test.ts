@@ -128,6 +128,6 @@ describe("source purity", () => {
 			await readFile(join(ROOT_DIR, "package.json"), "utf-8"),
 		) as Record<string, unknown>;
 		const devDeps = pkg.devDependencies as Record<string, string> | undefined;
-		expect(devDeps?.["@orgsdk/plugins"]).toBe("0.2.1");
+		expect(devDeps?.["@orgsdk/plugins"]).toBe("0.2.2");
 	});
 });
