@@ -38,7 +38,7 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && vars.ORGSDK_ENABLE_CATALOG_PUBLISH == 'true')
-    uses: OrgSDK/plugins/.github/workflows/plugin-publish.yml@4eb6706b38a8b1ccbad8b68bfbe9924e3167ef1f
+    uses: OrgSDK/plugins/.github/workflows/plugin-publish.yml@f690bf243d1f376e5fd7520ca3fa4ed0c944706e
     with:
       # push → real publish (when opted in); manual → honor the dry_run choice.
       dry-run: ${{ !(github.event_name == 'push' || github.event.inputs.dry_run == 'false') }}
