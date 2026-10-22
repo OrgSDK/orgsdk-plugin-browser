@@ -68,8 +68,8 @@ describeIntegration("real-Chromium integration (BROWSER_INTEGRATION=1)", () => {
 		expect(result.sizeBytes).toBeLessThan(50 * 1024 * 1024);
 		// Real PDF bytes start with %PDF-. Uint8Array byte access stays clean.
 		expect(result.bytes[0]).toBe(0x25); // %
-		expect(result.bytes[1]).toBe(0x44); // D
-		expect(result.bytes[2]).toBe(0x50); // P
+		expect(result.bytes[1]).toBe(0x50); // P
+		expect(result.bytes[2]).toBe(0x44); // D
 		expect(result.bytes[3]).toBe(0x46); // F
 		expect(result.bytes[4]).toBe(0x2d); // -
 		// Must finish inside the production render cap.
