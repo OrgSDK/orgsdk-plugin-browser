@@ -71,7 +71,7 @@ describe("plugin shape (flat-module)", () => {
 	it("generatePdf carries metadata.version matching the manifest", async () => {
 		const mod = await loadEntry();
 		const fn = mod.safeFunctions[0];
-		expect(fn.metadata?.version).toBe("1.1.1");
+		expect(fn.metadata?.version).toBe("1.1.2");
 	});
 
 	it("generatePdf declares requiredCredentials as undefined (no auth)", async () => {

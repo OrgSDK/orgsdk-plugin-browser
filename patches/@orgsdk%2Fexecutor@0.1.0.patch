@@ -1,0 +1,44 @@
+diff --git a/dist/package-dependencies.js b/dist/package-dependencies.js
+index ade592947392ce98ef7405b8cd299b9c8c766330..52ad10b8c93c3be7d12027884e936c8e743df8b9 100644
+--- a/dist/package-dependencies.js
++++ b/dist/package-dependencies.js
+@@ -23,10 +23,12 @@ async function packageDirectory(name, from) {
+   let directory = dirname(entry);
+   while (true) {
+     try {
+-      const metadata = packageSchema.parse(
+-        JSON.parse(await readFile(join(directory, "package.json"), "utf8"))
+-      );
+-      if (metadata.name === name) return realpath(directory);
++      const candidate = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
++      // Export-map entry points can be inside unnamed type-boundary packages.
++      if (candidate.name === name) {
++        packageSchema.parse(candidate);
++        return realpath(directory);
++      }
+     } catch (error) {
+       if (error.code !== "ENOENT") throw error;
+     }
+@@ -99,6 +101,16 @@ async function dependencyNotices(checkout) {
+     for (const file of files)
+       notices.push(await readFile(join(directory, file), "utf8"));
+     if (!files.length) {
++      const supplemental = await readFile(
++        join(checkout, "licenses", `${encodeURIComponent(pkg.name)}.txt`), "utf8"
++      ).catch((error) => {
++        if (error.code !== "ENOENT") throw error;
++        return "";
++      });
++      if (supplemental) {
++        notices.push(supplemental);
++        continue;
++      }
+       const readme = await readFile(join(directory, "README.md"), "utf8").catch(
+         () => ""
+       );
+diff --git a/dist/package-plugin.js b/dist/package-plugin.js
+--- a/dist/package-plugin.js
++++ b/dist/package-plugin.js
+@@ -106,1 +106,1 @@
+-  const configurationSchema = module.config?.schema ? z.toJSONSchema(module.config.schema) : { type: "object", additionalProperties: true };
++  const configurationSchema = module.config?.schema ? z.toJSONSchema(module.config.schema, { io: "input" }) : { type: "object", additionalProperties: true };

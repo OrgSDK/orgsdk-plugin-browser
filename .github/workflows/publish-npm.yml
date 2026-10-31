@@ -1,0 +1,115 @@
+name: Prepare or publish public npm package
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Verify and pack without publishing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.22.1"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: "1.4.0"
+      - name: Verify release ref and version
+        run: |
+          git merge-base --is-ancestor HEAD origin/main
+          node --input-type=module -e '
+            import assert from "node:assert/strict";
+            import fs from "node:fs";
+            const pkg = JSON.parse(fs.readFileSync("package.json"));
+            const manifest = JSON.parse(fs.readFileSync("plugin/.plugin.json"));
+            assert.equal(pkg.version, manifest.version);
+            if (process.env.GITHUB_REF_TYPE === "tag") assert.equal(process.env.GITHUB_REF_NAME, `v${pkg.version}`);
+            else assert.equal(process.env.GITHUB_REF_NAME, "main", "Manual releases must use main");
+          '
+      - run: bun install --frozen-lockfile
+      - name: Install matched headless Chromium for browser plugins
+        run: |
+          if node -e 'const p=require("./package.json"); process.exit(p.name.includes("plugin-browser") ? 0 : 1)'; then
+            bunx --no-install playwright install --with-deps chromium
+          fi
+      - name: Verify source
+        run: |
+          bun run check
+          bun run typecheck
+          bun audit
+          bun run test
+          bun run version-guard
+          bun run validate
+          bun run package
+      - name: Verify exact npm artifact through the executor
+        env:
+          NPM_TEST_ARTIFACT_DIR: artifacts
+        run: |
+          bun run build:npm
+          bun run test:executor
+          bun run test:registration
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: verified-npm-${{ github.sha }}
+          path: artifacts/*.tgz
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    if: >-
+      vars.ORGSDK_ENABLE_NPM_PUBLISH == 'true' &&
+      github.repository != 'OrgSDK/orgsdk-plugin-template' &&
+      (github.event_name == 'push' || inputs.dry_run == false)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.22.1"
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c809a3
+        with:
+          name: verified-npm-${{ github.sha }}
+          path: artifacts
+      - name: Publish the verified tarball with public access
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test -n "$NODE_AUTH_TOKEN" || { echo '::error::NPM_TOKEN is required for public publishing'; exit 1; }
+          set -- artifacts/*.tgz
+          test "$#" -eq 1
+          tar -xOf "$1" package/package.json | node --input-type=module -e '
+            import assert from "node:assert/strict";
+            let input = "";
+            for await (const chunk of process.stdin) input += chunk;
+            const pkg = JSON.parse(input);
+            assert.match(pkg.name, /^@orgsdk\/plugin-/);
+            assert.notEqual(pkg.name, "@orgsdk/plugin-template", "Rename the template before publishing");
+            assert.equal(pkg.publishConfig.access, "public");
+            assert.equal(pkg.publishConfig.registry, "https://registry.npmjs.org/");
+            assert.equal(pkg.publishConfig.provenance, true);
+            assert.equal(pkg.license, "Apache-2.0");
+            assert.equal(pkg.repository.url, `git+https://github.com/${process.env.GITHUB_REPOSITORY}.git`);
+          '
+          npm publish "$1" --access public --provenance --ignore-scripts

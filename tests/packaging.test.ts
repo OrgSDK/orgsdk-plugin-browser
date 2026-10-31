@@ -2,7 +2,7 @@
  * Packaging tests — determinism, stale-output removal, and generated
  * package.json in the staged artifact.
  *
- * browser declares playwright@1.60.0 as a runtime dependency. The catalog's
+ * browser declares playwright@1.64.1 as a runtime dependency. The catalog's
  * resolvePluginDeps step cannot statically bundle Playwright (chromium-bidi
  * has a dynamic import that defeats Bun.build), so the platform falls back to
  * shipping the dependency tree as a __deps.tar.b64 archive at publish time.
@@ -66,7 +66,7 @@ describe("packaging", () => {
 		expect(paths).toEqual(sorted);
 	});
 
-	it("generated package.json in artifact carries playwright@1.60.0 as the only runtime dep", async () => {
+	it("generated package.json in artifact carries playwright@1.64.1 as the only runtime dep", async () => {
 		const { name, version } = await readManifestInfo();
 		await $`bun run package`.cwd(ROOT).quiet();
 		const pkgPath = join(DIST_DIR, name, "package.json");
@@ -81,7 +81,7 @@ describe("packaging", () => {
 		// playwright IS the runtime dependency (defaultLauncher.launch imports it).
 		const deps = pkg.dependencies as Record<string, string> | undefined;
 		expect(deps).toBeDefined();
-		expect(deps?.playwright).toBe("1.60.0");
+		expect(deps?.playwright).toBe("1.64.1");
 		// The authoring SDK must NOT be a runtime dependency (type-only).
 		expect(deps?.["@orgsdk/plugins"]).toBeUndefined();
 		expect(Object.keys(deps ?? {}).sort()).toEqual(["playwright"]);

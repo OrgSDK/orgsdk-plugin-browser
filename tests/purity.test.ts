@@ -6,7 +6,7 @@
  *
  * browser is a thin repo: two source files (browser-renderer.ts +
  * pdf-functions.ts) joined by sibling (`./`) imports. The only runtime
- * dependency is `playwright@1.60.0`, resolved lazily inside
+ * dependency is `playwright@1.64.1`, resolved lazily inside
  * defaultLauncher.launch via `await import("playwright")` (the lazy import is
  * the contract that lets unit tests run without the playwright package
  * installed).
@@ -111,13 +111,13 @@ describe("source purity", () => {
 		);
 	});
 
-	it("package.json declares playwright@1.60.0 as the only runtime dependency", async () => {
+	it("package.json declares playwright@1.64.1 as the only runtime dependency", async () => {
 		const pkg = JSON.parse(
 			await readFile(join(ROOT_DIR, "package.json"), "utf-8"),
 		) as Record<string, unknown>;
 		const deps = pkg.dependencies as Record<string, string> | undefined;
 		expect(deps).toBeDefined();
-		expect(deps?.playwright).toBe("1.60.0");
+		expect(deps?.playwright).toBe("1.64.1");
 		expect(Object.keys(deps ?? {}).sort()).toEqual(["playwright"]);
 		// @orgsdk/plugins must be dev-only, never runtime.
 		expect(deps?.["@orgsdk/plugins"]).toBeUndefined();
