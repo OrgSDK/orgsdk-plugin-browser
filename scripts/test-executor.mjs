@@ -40,7 +40,7 @@ delete process.env.EXECUTOR_AGENT_DIR;
 
 try {
 	// Test the actual npm payload after extraction, away from the source tree.
-	const packed = JSON.parse(
+	const packOutput = JSON.parse(
 		execFileSync(
 			"npm",
 			[
@@ -54,7 +54,30 @@ try {
 			{ cwd: root, encoding: "utf8" },
 		),
 	);
+	const expectedPackage = JSON.parse(
+		await readFile(join(root, "dist/npm/package.json"), "utf8"),
+	);
+	assert(packOutput !== null && typeof packOutput === "object");
+	if (!Array.isArray(packOutput))
+		assert.deepEqual(Object.keys(packOutput), [expectedPackage.name]);
+	const packed = Array.isArray(packOutput)
+		? packOutput
+		: Object.values(packOutput);
 	assert.equal(packed.length, 1);
+	assert.equal(packed[0].name, expectedPackage.name);
+	assert.equal(packed[0].version, expectedPackage.version);
+	assert.equal(
+		packed[0].filename,
+		`${expectedPackage.name.replace(/^@/, "").replace("/", "-")}-${expectedPackage.version}.tgz`,
+	);
+	assert.equal(typeof packed[0].integrity, "string");
+	assert.match(packed[0].integrity, /^sha512-[A-Za-z0-9+/]{86}==$/);
+	assert.equal(
+		packed[0].integrity,
+		`sha512-${createHash("sha512")
+			.update(await readFile(join(temporary, packed[0].filename)))
+			.digest("base64")}`,
+	);
 	assert(
 		packed[0].files.every(
 			({ path }) =>
