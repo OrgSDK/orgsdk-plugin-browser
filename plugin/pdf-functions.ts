@@ -55,7 +55,7 @@ export const safeFunctions: SafeFunction[] = [
 		metadata: {
 			category: "browser",
 			tags: ["io"],
-			version: "1.1.1",
+			version: "1.1.2",
 			relatedTo: ["parsePdf", "sendMessageWithAttachment", "upsertArtifact"],
 		},
 		docs: {

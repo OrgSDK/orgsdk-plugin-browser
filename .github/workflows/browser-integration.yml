@@ -1,0 +1,29 @@
+name: Manual real Chromium integration
+
+# Runtime verification only. No publisher, credentials or shared browser session.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.22.1"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: "1.4.0"
+      - run: bun install --frozen-lockfile
+      - name: Install driver-matched Chromium
+        run: bunx --no-install playwright install --with-deps chromium
+      - run: bun run typecheck
+      - name: Render real PDFs and verify hardening and cleanup
+        run: bun run test:integration

@@ -1,5 +1,5 @@
 /**
- * Manifest tests — assert the v1.1.1 forward-patch changes and preserved
+ * Manifest tests — assert the v1.1.2 forward-patch changes and preserved
  * marketplace metadata.
  *
  * browser has no auth (no credential provider, no callback) — the manifest
@@ -23,9 +23,9 @@ describe("manifest", () => {
 		expect(m.name).toBe("browser");
 	});
 
-	it("has the bumped version 1.1.1 (forward patch)", async () => {
+	it("has the bumped version 1.1.2 (forward patch)", async () => {
 		const m = await readManifest();
-		expect(m.version).toBe("1.1.1");
+		expect(m.version).toBe("1.1.2");
 	});
 
 	it("declares the canonical $schema", async () => {

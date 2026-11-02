@@ -1,5 +1,39 @@
 # @orgsdk/plugin-browser
 
+## Current npm distribution and execution checks
+
+Updated **31 October 2026**. This public-release candidate uses `@orgsdk/plugins@0.2.2`
+and `@orgsdk/executor@0.1.0` (with the tracked packaging compatibility patch).
+`bun run build:npm` creates a public Apache-2.0 npm payload; `bun run test:executor`
+downloads the extracted npm entry into an empty executor store and executes every exported function headlessly.
+`bun run test:registration` verifies fresh-project registration using the npm host.
+See [npm distribution, CI activation and verification](docs/npm-distribution.md)
+for prerequisites, commands, fixtures and release settings. Publication remains
+an explicit release operation; source-root `private: true` is retained.
+
+## Current installation and credential contract
+
+Configure the generated `dist/npm/plugin.catalog.json` as an OrgSDK release
+catalogue, then add its pinned external release to a project. Installing npm files
+alone does not register the plugin. Its package URL addresses the immutable npm
+version through jsDelivr; that URL becomes available only after publication.
+The catalogue retains the bundle's SHA256 digest. No release is published by
+building or testing locally.
+
+Native Google, Twitter, LinkedIn and Facebook OAuth connections are owned by the
+OrgSDK host. Plugins receive only `{source: "byo", secret_accessToken}` under
+their provider key. Client and refresh secrets stay on the host. The retired
+first-party relay is unsupported. Generic token providers receive their stored
+secret record. See [the current distribution guide](docs/npm-distribution.md).
+
+## Historical author-source and hosted-catalogue reference
+
+The material below preserves the original extraction and legacy authoring
+workflows. Its callback/relay, source-archive publication and private-licence
+claims describe the former host. The current npm, authentication and licensing
+contract above supersedes those claims.
+
+
 Official OrgSDK plugin for hardened HTML→PDF rendering. Spins up headless
 Chromium with JavaScript disabled and every external/resource request blocked,
 then returns base64-encoded PDF bytes. No credentials required — every
@@ -40,24 +74,21 @@ filesystem read (`file://`), resource exhaustion, and process leaks. Controls:
 
 ## Runtime dependency
 
-Playwright (`playwright@1.60.0` exactly — pinned to the driver the hardening
-was qualified against). The Chromium binary itself is provided by the daemon
-image at `PLAYWRIGHT_BROWSERS_PATH`; the Playwright JS package is shipped
-**self-contained** in the plugin's own `node_modules` via the catalog's
-`__deps.tar.b64` fallback (Playwright's `chromium-bidi` dynamic import defeats
-`Bun.build`, so the platform's `resolvePluginDeps` falls back to shipping the
-dependency tree as an archive). The daemon's `writePluginFolder` extracts the
-archive into `<plugin>/node_modules` at boot — Playwright never pollutes the
-daemon image's shared `node_modules` pool.
+Playwright is pinned to **1.64.1**. The executor packager embeds its JavaScript
+closure in the npm bundle. Install the matching Chromium build and OS libraries
+before execution; CI uses `playwright install --with-deps chromium`. A real
+headless render of the extracted npm package is required by the executor test.
 
-See [docs/release.md](docs/release.md) for the full packaging + fallback story.
+See [npm distribution](docs/npm-distribution.md) for current packaging and tests.
+[docs/release.md](docs/release.md) retains the historical hosted-catalogue archive
+investigation; it does not describe the current executor capsule.
 
 ## Repository layout
 
 ```
 orgsdk-plugin-browser/
 ├── .github/workflows/
-│   ├── ci.yml                 # reusable CI (mocked) + opt-in real-Chromium job
+│   ├── ci.yml                 # author checks + headless npm executor tests
 │   └── publish-catalog.yml    # reusable publish workflow (opt-in; manual dry-run)
 ├── plugin/                    # the publishable plugin folder
 │   ├── .plugin.json           # manifest (slug, version, marketplace, sourceRepo)
@@ -144,4 +175,4 @@ content is rejected with HTTP 409.
 
 ## License
 
-Apache-2.0 (matches the OrgSDK plugin authoring SDK).
+Apache-2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE) and [TRADEMARKS.md](TRADEMARKS.md).

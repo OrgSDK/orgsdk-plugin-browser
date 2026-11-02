@@ -1,0 +1,8 @@
+OrgSDK Plugins
+Copyright 2026 OrgSDK contributors.
+
+Plugin code is licensed under Apache-2.0. The embedded dependency loader
+incorporated from @orgsdk/executor 0.1.0 is also made available by OrgSDK under
+Apache-2.0 for these plugin distributions. This grant does not relicense the
+remaining executor or platform code. Third-party dependencies retain the
+licences and attribution reproduced in plugin.notices.txt.

@@ -1,5 +1,8 @@
 # Release & catalog promotion
 
+Historical hosted-catalogue investigation. For the current restricted npm
+payload and real executor/headless test, read [npm distribution](npm-distribution.md).
+
 ## Publishing model: not yet opted in
 
 This repository is configured for automatic catalog publication via the shared

@@ -14,7 +14,7 @@
  * This test verifies the contract in two parts:
  *
  *  PART A — plugin + archive are contract-correct:
- *   1. Staging playwright@1.60.0 + the plugin source produces a node_modules
+ *   1. Staging playwright@1.64.1 + the plugin source produces a node_modules
  *      whose closure is what the archive ships.
  *   2. Bun.build fails on the browser entry (the fallback trigger).
  *   3. The gzipped-tar archive's base64 size is below the platform's 15 MB
@@ -81,7 +81,7 @@ async function stagePlugin(root: string): Promise<void> {
 	await writeFile(
 		join(root, "package.json"),
 		JSON.stringify(
-			{ private: true, dependencies: { playwright: "1.60.0" } },
+			{ private: true, dependencies: { playwright: "1.64.1" } },
 			null,
 			2,
 		),
@@ -131,7 +131,7 @@ describe("dependency-archive fallback contract", () => {
 
 	// ─── PART A: plugin + archive are contract-correct ────────────────────
 
-	it("stages playwright@1.60.0 into a self-contained node_modules", async () => {
+	it("stages playwright@1.64.1 into a self-contained node_modules", async () => {
 		const dir = await ensureStaged();
 		const pwPkg = join(dir, "node_modules", "playwright", "package.json");
 		expect(existsSync(pwPkg)).toBe(true);
@@ -140,7 +140,7 @@ describe("dependency-archive fallback contract", () => {
 			version: string;
 		};
 		expect(pw.name).toBe("playwright");
-		expect(pw.version).toBe("1.60.0");
+		expect(pw.version).toBe("1.64.1");
 	});
 
 	it("Bun.build fails to statically bundle the browser entry (fallback trigger)", async () => {
@@ -197,7 +197,7 @@ describe("dependency-archive fallback contract", () => {
 		const pw = JSON.parse(await readFile(pwManifest, "utf-8")) as {
 			version: string;
 		};
-		expect(pw.version).toBe("1.60.0");
+		expect(pw.version).toBe("1.64.1");
 	});
 
 	it("playwright resolves from the extracted node_modules — no shared/global Playwright", async () => {
