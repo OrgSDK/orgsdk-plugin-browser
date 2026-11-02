@@ -8,7 +8,7 @@ test("real Chromium integration retains a manual non-publishing workflow", async
 		"utf8",
 	).catch(() => "");
 	assert.match(workflow, /workflow_dispatch:/);
-	assert.doesNotMatch(workflow, /^  (push|pull_request):/m);
+	assert.doesNotMatch(workflow, /^ {2}(push|pull_request):/m);
 	assert.match(workflow, /contents: read/);
 	assert.match(workflow, /bun run test:integration/);
 	assert.match(workflow, /PLAYWRIGHT_BROWSERS_PATH:/);
