@@ -75,29 +75,58 @@ Retain the exact tested tarball with:
 NPM_TEST_ARTIFACT_DIR=artifacts bun run test:executor
 ```
 
-## Release workflow, prepared but disabled
+## Direct trusted publishing
 
-CI checks author source, dependencies, npm execution and fresh registration.
-`publish-npm.yml` verifies matching versions on a `v<version>` tag contained in
-`main`, or a manual `main` run defaulting to dry run. It retains the tested npm
-tarball and publishes those bytes only. Publication requires all of:
+Updated **7 November 2026**. `publish-npm.yml` verifies source, dependency audit,
+all exported functions in the exact npm tarball, and fresh host registration.
+It publishes only the retained verified tarball. Source roots stay private npm
+packages; only the generated payload is released.
 
-- Separate publication authority and a public GitHub repository matching the
-  generated package's repository metadata. Local-only repositories still need
-  their own independently owned remote and initial source publication.
-- A protected `npm-publish` environment with maintainer review, scoped npm write
-  credentials in `NPM_TOKEN`, and npm policy allowing CI publication.
-- Explicit repository variable `ORGSDK_ENABLE_NPM_PUBLISH=true` and a release tag
-  or a manual run with `dry_run=false`.
+Configure each package's npm trusted publisher with its exact `OrgSDK` repository,
+workflow filename `publish-npm.yml`, environment `npm-publish`, and **Allow npm
+publish**. Stage-only trust still requires interactive npm approval and is not
+suitable for unattended releases. Use a protected GitHub environment to retain
+release review. The publish job runs on a GitHub-hosted runner with Node 24,
+pinned npm 12.0.2 and `id-token: write`; it needs no `NPM_TOKEN`.
 
-The job uses `--access public --provenance`, grants `id-token: write` only to the
-publish job, and checks Apache/public metadata and the exact GitHub identity.
-Template repositories/packages remain blocked until renamed. Do not enable any
-release gate as part of local preparation. No remote, registry token, repository
-visibility, environment or release setting is changed by these files. Consult
-[npm provenance](https://docs.npmjs.com/generating-provenance-statements/) before
-the authorised release. npm publication and catalogue promotion are separate
-operations; the historical `publish:catalog` command remains manual-only.
+Enable `ORGSDK_ENABLE_NPM_PUBLISH=true`, then push a matching `v<version>` tag
+contained in `main`, or dispatch on `main` with `dry_run=false` and
+`bootstrap_identity=false`. Default manual runs only verify and pack.
+New npm trust must complete its first successful publication within two days.
+After verifying OIDC publication, revoke obsolete publishing tokens and restrict
+traditional token publishing in npm settings. Template publication remains blocked.
+
+### One-time setup for a missing npm package
+
+npm requires a package identity before trust can be configured. The separately
+gated bootstrap job creates a metadata-only staged reservation at
+`0.0.0-bootstrap.0`; npm exposes its own `0.0.0-stage` placeholder. **Never approve
+or install the bootstrap reservation.** It contains no executable plugin code.
+
+1. Create a temporary granular npm token with stage-only write access to the
+   `@orgsdk` scope, no organization-management access, no 2FA bypass, and the
+   shortest expiry. Store it securely as `NPM_BOOTSTRAP_TOKEN` in the protected
+   `npm-publish` environment; never put credentials in source or chat.
+2. Keep the normal release gate off. Enable `ORGSDK_ENABLE_NPM_BOOTSTRAP=true`
+   and dispatch on `main` with `dry_run=false`, `bootstrap_identity=true`.
+   The job requires registry 404 and derives only identity and legal metadata
+   from the verified tarball. Existing packages must skip bootstrap.
+3. Configure direct publishing trust for the resulting package, for example:
+   `npm trust github @orgsdk/plugin-NAME --repo OrgSDK/orgsdk-plugin-NAME --file publish-npm.yml --environment npm-publish --allow-publish --yes`.
+   Account authentication/2FA is required for this one-time configuration.
+4. Disable the bootstrap gate and remove/revoke the temporary credential after
+   all intended package identities are reserved. Enable normal OIDC publishing
+   and dispatch the release with `bootstrap_identity=false`.
+5. Verify the public npm version, integrity, provenance, and fresh consumer path.
+   Only afterward reject the identified bootstrap stage; preserve the package.
+
+GitHub source visibility, registry publication, catalogue promotion, website
+deployment and live provider-account tests are separate results. Release tests
+use synthetic provider fixtures, not live customer accounts.
+
+References: [trusted publishing](https://docs.npmjs.com/trusted-publishers/),
+[npm trust](https://docs.npmjs.com/cli/v12/commands/npm-trust/), and
+[staged publishing](https://docs.npmjs.com/staged-publishing/).
 
 ## Packaging compatibility and maintenance
 
