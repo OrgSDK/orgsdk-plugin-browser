@@ -22,7 +22,7 @@ permissions:
 jobs:
   publish:
     if: github.event_name == 'workflow_dispatch'
-    uses: OrgSDK/plugins/.github/workflows/plugin-publish.yml@4eb6706b38a8b1ccbad8b68bfbe9924e3167ef1f
+    uses: OrgSDK/plugins/.github/workflows/plugin-publish.yml@aef659a09365dd980715ec9b1bc7664c78dfd34d
     with:
       # push → real publish (when opted in); manual → honor the dry_run choice.
       dry-run: ${{ github.event.inputs.dry_run != 'false' }}
